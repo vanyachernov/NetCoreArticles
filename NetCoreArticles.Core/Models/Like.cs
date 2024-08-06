@@ -2,6 +2,9 @@ using CSharpFunctionalExtensions;
 
 namespace NetCoreArticles.Core.Models;
 
+/// <summary>
+/// Represents a user's like article.
+/// </summary>
 public class Like
 {
     private Like(Guid id, Guid articleId, Guid userId, DateTime createdAt)
