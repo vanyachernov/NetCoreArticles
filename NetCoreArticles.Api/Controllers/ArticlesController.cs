@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
 using NetCoreArticles.Core.Abstractions;
 using NetCoreArticles.Core.Contracts;
@@ -11,8 +12,6 @@ public class ArticlesController : ControllerBase
 {
     private readonly IArticlesService _articlesService;
     private readonly IImagesService _imagesService;
-    private readonly string _staticFilesPath =
-        Path.Combine(Directory.GetCurrentDirectory(), "StaticFiles/Images");
 
     public ArticlesController(
         IArticlesService articlesService,
@@ -44,12 +43,11 @@ public class ArticlesController : ControllerBase
     [HttpPost]
     [Route("create")]
     public async Task<ActionResult<Article>> CreateArticle(
-        [FromBody] ArticlesRequest article,
+        [FromForm] ArticlesRequest article,
         CancellationToken token)
     {
         var imageProcessingResult = await _imagesService.CreateImage(
-            article.TitleImage, 
-            _staticFilesPath, 
+            article.TitleImage,
             token);
 
         if (imageProcessingResult.IsFailure)
@@ -69,8 +67,17 @@ public class ArticlesController : ControllerBase
             return BadRequest(newArticle.Error);
         }
 
-        return await _articlesService.CreateArticleAsync(
+        await _articlesService.CreateArticleAsync(
             newArticle.Value, 
             token);
+         
+         var isImagePerforming = await _imagesService.SaveImage(newArticle.Value.Id, imageProcessingResult.Value, token);
+
+         if (!isImagePerforming)
+         {
+             return BadRequest("Image could not be uploaded to the database.");
+         }
+
+         return newArticle.Value;
     }
 }

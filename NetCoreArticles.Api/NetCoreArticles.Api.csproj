@@ -21,4 +21,8 @@
       <ProjectReference Include="..\NetCoreArticles.Infrastructure\NetCoreArticles.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="StaticFiles\Images\" />
+    </ItemGroup>
+
 </Project>

@@ -1,6 +1,7 @@
 using System.Net.Mime;
 using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NetCoreArticles.Core.Abstractions;
 using NetCoreArticles.Core.Models;
 using NetCoreArticles.DataAccess.Entities;
@@ -10,10 +11,14 @@ namespace NetCoreArticles.DataAccess.Repositories;
 public class ArticlesRepository : IArticlesRepository
 {
     private readonly ApplicationDbContext _context;
+    private readonly ILogger<ArticlesRepository> _logger;
 
-    public ArticlesRepository(ApplicationDbContext context)
+    public ArticlesRepository(
+        ApplicationDbContext context,
+        ILogger<ArticlesRepository> logger)
     {
         _context = context;
+        _logger = logger;
     }
     
     public async Task<Article> CreateAsync(Article article, CancellationToken cancellationToken = default)
@@ -39,23 +44,55 @@ public class ArticlesRepository : IArticlesRepository
     public async Task<IEnumerable<Article>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var articleEntities = await _context.Articles
-            .Include(a => a.Author)
+            .Include(a => a.ArticleImage)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        var articles = articleEntities.Select(a => Article.Create(
-                a.Id, 
-                a.AuthorId, 
-                a.Title, 
-                a.Content,
-                Image.Create(a.ArticleImage.FileName).Value
-            ))
-            .Where(r => r.IsSuccess)
-            .Select(r => r.Value)
-            .ToList();
+        var articles = new List<Article>();
+
+        foreach (var articleEntity in articleEntities)
+        {
+            Image? articleImage = null;
+
+            if (articleEntity.ArticleImage != null && !string.IsNullOrEmpty(articleEntity.ArticleImage.FileName))
+            {
+                var imageResult = Image.Create(articleEntity.ArticleImage.FileName);
+
+                imageResult.Value.ArticleId = articleEntity.Id;
+
+                if (imageResult.IsFailure)
+                {
+                    _logger.LogError(imageResult.Error);
+                    break;
+                }
+                
+                articleImage = imageResult.Value;
+            }
+            else
+            {
+                _logger.LogError("Article image is null or file name is empty for article with ID: " + articleEntity.Id);
+            }
+
+            var articleResult = Article.Create(
+                articleEntity.Id,
+                articleEntity.AuthorId,
+                articleEntity.Title,
+                articleEntity.Content,
+                articleImage
+            );
+
+            if (articleResult.IsFailure)
+            {
+                _logger.LogError(articleResult.Error);
+            }
+            
+            articles.Add(articleResult.Value);
+        }
 
         return articles;
     }
+
+
 
     public async Task<Result<Article>> GetByIdAsync(Guid articleId, CancellationToken cancellationToken = default)
     {

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using NetCoreArticles.Core.Abstractions;
 using NetCoreArticles.DataAccess;
 using NetCoreArticles.DataAccess.Repositories;
+using NetCoreArticles.Infrastructure.Features;
 using NetCoreArticles.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<ILikesService, LikesService>();
     builder.Services.AddScoped<IImagesService, ImagesService>();
     builder.Services.AddScoped<IUsersService, UsersService>();
+    builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
@@ -30,7 +32,9 @@ var app = builder.Build();
         app.UseSwagger();
         app.UseSwaggerUI();
     }
+
     app.UseHttpsRedirection();
+    app.UseStaticFiles();
     app.MapControllers();
     app.Run();
 }

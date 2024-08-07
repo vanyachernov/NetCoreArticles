@@ -14,11 +14,11 @@ public class ImagesRepository : IImagesRepository
         _context = context;
     }
     
-    public async Task<Image> AddAsync(Image image, CancellationToken cancellationToken = default)
+    public async Task<bool> AddAsync(Guid articleId, Image image, CancellationToken cancellationToken = default)
     {
         var imageEntity = new ImageEntity
         {
-            ArticleId = image.ArticleId,
+            ArticleId = articleId,
             FileName = image.FileName
         };
 
@@ -26,7 +26,7 @@ public class ImagesRepository : IImagesRepository
             .AddAsync(imageEntity, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return image;
+        return true;
     }
 
     public async Task<bool> DeleteAsync(Guid articleId, CancellationToken cancellationToken = default)
