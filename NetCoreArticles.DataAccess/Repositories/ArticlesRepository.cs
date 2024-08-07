@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
 using NetCoreArticles.Core.Abstractions;
@@ -46,10 +47,8 @@ public class ArticlesRepository : IArticlesRepository
                 a.Id, 
                 a.AuthorId, 
                 a.Title, 
-                a.Content, 
-                a.Views, 
-                a.CreatedAt, 
-                a.UpdatedAt
+                a.Content,
+                Image.Create(a.ArticleImage.FileName).Value
             ))
             .Where(r => r.IsSuccess)
             .Select(r => r.Value)
@@ -73,10 +72,8 @@ public class ArticlesRepository : IArticlesRepository
             articleEntity.Id, 
             articleEntity.AuthorId, 
             articleEntity.Title,
-            articleEntity.Content, 
-            articleEntity.Views, 
-            articleEntity.CreatedAt, 
-            articleEntity.UpdatedAt);
+            articleEntity.Content,
+            Image.Create(articleEntity.ArticleImage.FileName).Value);
 
         return article;
     }

@@ -18,6 +18,7 @@
     <ItemGroup>
       <ProjectReference Include="..\NetCoreArticles.Core\NetCoreArticles.Core.csproj" />
       <ProjectReference Include="..\NetCoreArticles.DataAccess\NetCoreArticles.DataAccess.csproj" />
+      <ProjectReference Include="..\NetCoreArticles.Infrastructure\NetCoreArticles.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
