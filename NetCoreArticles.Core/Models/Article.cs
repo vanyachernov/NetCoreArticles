@@ -7,15 +7,13 @@ namespace NetCoreArticles.Core.Models;
 /// </summary>
 public class Article
 {
-    private Article(Guid id, Guid authorId, string title, string content, int views, DateTime createdAt, DateTime updatedAt)
+    private Article(Guid id, Guid authorId, string title, string content, Image? articleImage)
     {
         Id = id;
         AuthorId = authorId;
         Title = title;
         Content = content;
-        Views = views;
-        CreatedAt = createdAt;
-        UpdatedAt = updatedAt;
+        ArticleImage = articleImage;
     }
     
     /// <summary>
@@ -60,9 +58,9 @@ public class Article
 
     public void CountView() => Views++;
 
-    public static Result<Article> Create(Guid id, Guid authorId, string title, string content, int views, DateTime createdAt, DateTime updatedAt)
+    public static Result<Article> Create(Guid id, Guid authorId, string title, string content, Image? articleImage)
     {
-        var newArticle = new Article(id, authorId, title, content, views, createdAt, updatedAt);
+        var newArticle = new Article(id, authorId, title, content, articleImage);
 
         return Result.Success(newArticle);
     }

@@ -1,3 +1,5 @@
+using CSharpFunctionalExtensions;
+
 namespace NetCoreArticles.Core.Models;
 
 /// <summary>
@@ -33,8 +35,10 @@ public class User
     /// </summary>
     public string PasswordHash { get; }
 
-    public static User Create(Guid id, string username, string email, string passwordHash)
+    public static Result<User> Create(Guid id, string username, string email, string passwordHash)
     {
-        return new User(id, username, email, passwordHash);
+        var newUser = new User(id, username, email, passwordHash);
+
+        return Result.Success(newUser);
     }
 }
