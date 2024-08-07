@@ -44,12 +44,12 @@ public class Article
     /// <summary>
     /// Gets an article created date.
     /// </summary>
-    public DateTime CreatedAt { get; }
+    public DateTime CreatedAt { get; private set; }
     
     /// <summary>
     /// Gets an article updated date.
     /// </summary>
-    public DateTime UpdatedAt { get; }
+    public DateTime UpdatedAt { get; private set; }
     
     /// <summary>
     /// Gets an article image.
@@ -57,6 +57,10 @@ public class Article
     public Image? ArticleImage { get; }
 
     public void CountView() => Views++;
+
+    public void SetCreatedDate(DateTime createdDate) => CreatedAt = createdDate;
+    
+    public void SetUpdatedDate(DateTime updatedDate) => UpdatedAt = updatedDate;
 
     public static Result<Article> Create(Guid id, Guid authorId, string title, string content, Image? articleImage)
     {

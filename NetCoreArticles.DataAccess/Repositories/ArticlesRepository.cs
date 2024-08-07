@@ -80,6 +80,9 @@ public class ArticlesRepository : IArticlesRepository
                 articleEntity.Content,
                 articleImage
             );
+            
+            articleResult.Value.SetCreatedDate(articleEntity.CreatedAt);
+            articleResult.Value.SetUpdatedDate(articleEntity.UpdatedAt);
 
             if (articleResult.IsFailure)
             {
@@ -97,6 +100,7 @@ public class ArticlesRepository : IArticlesRepository
     public async Task<Result<Article>> GetByIdAsync(Guid articleId, CancellationToken cancellationToken = default)
     {
         var articleEntity = await _context.Articles
+            .Include(a => a.ArticleImage)
             .AsNoTracking()
             .FirstOrDefaultAsync(a => a.Id == articleId, cancellationToken);
 
@@ -105,13 +109,42 @@ public class ArticlesRepository : IArticlesRepository
             return Result.Failure<Article>("Article not found!");
         }
         
+        Image? articleImage = null;
+        
+        if (articleEntity.ArticleImage != null && !string.IsNullOrEmpty(articleEntity.ArticleImage.FileName))
+        {
+            var imageResult = Image.Create(articleEntity.ArticleImage.FileName);
+
+            imageResult.Value.ArticleId = articleEntity.Id;
+
+            if (imageResult.IsFailure)
+            {
+                _logger.LogError(imageResult.Error);
+            }
+                
+            articleImage = imageResult.Value;
+        }
+        else
+        {
+            _logger.LogError("Article image is null or file name is empty for article with ID: " + articleEntity.Id);
+        }
+        
         var article = Article.Create(
-            articleEntity.Id, 
-            articleEntity.AuthorId, 
+            articleEntity.Id,
+            articleEntity.AuthorId,
             articleEntity.Title,
             articleEntity.Content,
-            Image.Create(articleEntity.ArticleImage.FileName).Value);
+            articleImage
+        );
+        
+        article.Value.SetCreatedDate(articleEntity.CreatedAt);
+        article.Value.SetUpdatedDate(articleEntity.UpdatedAt);
 
+        if (article.IsFailure)
+        {
+            _logger.LogError(article.Error);
+        }
+        
         return article;
     }
 
