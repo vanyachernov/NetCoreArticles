@@ -8,7 +8,7 @@ public class ArticleEntity
     /// <summary>
     /// Gets or sets an article identifier.
     /// </summary>
-    public Guid Id { get; }
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets an article's author identifier.
