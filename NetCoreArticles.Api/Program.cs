@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NetCoreArticles.Api.Middleware;
 using NetCoreArticles.Core.Abstractions;
 using NetCoreArticles.DataAccess;
 using NetCoreArticles.DataAccess.Repositories;
@@ -35,6 +36,7 @@ var app = builder.Build();
 
     app.UseHttpsRedirection();
     app.UseStaticFiles();
+    app.UseMiddleware<TaskCancellationHandlingMiddleware>();
     app.MapControllers();
     app.Run();
 }
