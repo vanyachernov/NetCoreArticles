@@ -61,8 +61,9 @@ public class Article
     /// Gets an article image.
     /// </summary>
     public Image? ArticleImage { get; }
-
-    public void CountView() => Views++;
+    
+    public void SetViews(int views) => Views = views;
+    
     public void SetCreatedDate(DateTime createdDate) => CreatedAt = createdDate;
     
     public void SetUpdatedDate(DateTime updatedDate) => UpdatedAt = updatedDate;

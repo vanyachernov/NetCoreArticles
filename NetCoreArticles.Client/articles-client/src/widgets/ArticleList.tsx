@@ -19,7 +19,7 @@ export default function ArticleList() {
     return (
         <div className="flex flex-row w-full lg:w-4/5 flex-wrap lg:justify-between gap-[20px]">
             {!loading ? articles.map((article) => (
-                <ArticleCard article={article} />
+                <ArticleCard key={article.id} article={article} />
             )) : (
                 <div>
                     No articles data.

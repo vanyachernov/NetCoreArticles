@@ -11,4 +11,5 @@ public interface IArticlesRepository
     Task<IQueryable<Article>> GetByFilterAsync(string title, CancellationToken cancellationToken = default);
     Task<Article> UpdateAsync(Article article, CancellationToken cancellationToken = default);
     Task<Guid> DeleteAsync(Guid articleId, CancellationToken cancellationToken = default);
+    Task AddViewToArticle(Guid articleId, CancellationToken cancellationToken = default);
 }

@@ -6,7 +6,7 @@ export default interface Article {
     author: Author,
     title: string,
     content: string,
-    articleImage: Image
+    image: Image
     views: number, 
     createdAt: Date
     updatedAt: Date

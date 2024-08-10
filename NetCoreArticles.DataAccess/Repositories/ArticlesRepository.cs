@@ -1,4 +1,3 @@
-using System.Net.Mime;
 using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -95,6 +94,7 @@ public class ArticlesRepository : IArticlesRepository
                 articleImage
             );
             
+            articleResult.Value.SetViews(articleEntity.Views + 1);
             articleResult.Value.SetCreatedDate(articleEntity.CreatedAt);
             articleResult.Value.SetUpdatedDate(articleEntity.UpdatedAt);
 
@@ -124,6 +124,8 @@ public class ArticlesRepository : IArticlesRepository
             return Result.Failure<Article>("Article not found!");
         }
         
+        await AddViewToArticle(articleId, cancellationToken);
+        
         var userResult = User.Create(
             articleEntity.Author.Id, 
             articleEntity.Author.Username,
@@ -144,9 +146,10 @@ public class ArticlesRepository : IArticlesRepository
             articleEntity.Content,
             Image.Create(articleEntity.ArticleImage.FileName).Value);
         
+        article.Value.SetViews(articleEntity.Views + 1);
         article.Value.SetCreatedDate(articleEntity.CreatedAt);
         article.Value.SetUpdatedDate(articleEntity.UpdatedAt);
-
+        
         return article;
     }
 
@@ -174,5 +177,16 @@ public class ArticlesRepository : IArticlesRepository
             .ExecuteDeleteAsync(cancellationToken);
 
         return articleId;
+    }
+
+    public async Task AddViewToArticle(Guid articleId, CancellationToken cancellationToken = default)
+    {
+        var article = await _context.Articles.FirstOrDefaultAsync(a => a.Id == articleId, cancellationToken);
+
+        var newViewValue = article!.Views + 1;
+
+        article.Views = newViewValue;
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }
