@@ -22,7 +22,7 @@ public class ArticlesController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Article>>> GetArticles(CancellationToken token)
+    public async Task<ActionResult<IEnumerable<ArticleResponse>>> GetArticles(CancellationToken token)
     {
         var articles = await _articlesService.GetAllArticlesAsync(token);
         
@@ -31,7 +31,7 @@ public class ArticlesController : ControllerBase
 
     [HttpGet]
     [Route("{articleId:guid}")]
-    public async Task<ActionResult<Article>> GetArticleByIdentifier(
+    public async Task<ActionResult<ArticleResponse>> GetArticleByIdentifier(
         [FromRoute] Guid articleId,
         CancellationToken token)
     {
@@ -58,6 +58,7 @@ public class ArticlesController : ControllerBase
         var newArticle = Article.Create(
             Guid.NewGuid(), 
             article.AuthorId, 
+            null,
             article.Title, 
             article.Content,
             imageProcessingResult.Value);

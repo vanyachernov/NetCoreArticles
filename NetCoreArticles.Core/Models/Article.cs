@@ -7,10 +7,11 @@ namespace NetCoreArticles.Core.Models;
 /// </summary>
 public class Article
 {
-    private Article(Guid id, Guid authorId, string title, string content, Image? articleImage)
+    private Article(Guid id, Guid authorId, User? author, string title, string content, Image? articleImage)
     {
         Id = id;
         AuthorId = authorId;
+        Author = author;
         Title = title;
         Content = content;
         ArticleImage = articleImage;
@@ -25,6 +26,11 @@ public class Article
     /// Gets an article's author identifier.
     /// </summary>
     public Guid AuthorId { get; }
+    
+    /// <summary>
+    /// Gets an article's author.
+    /// </summary>
+    public User Author { get; }
 
     /// <summary>
     /// Gets an article title.
@@ -57,10 +63,10 @@ public class Article
     public Image? ArticleImage { get; }
 
     public void CountView() => Views++;
-
-    public static Result<Article> Create(Guid id, Guid authorId, string title, string content, Image? articleImage)
+    
+    public static Result<Article> Create(Guid id, Guid authorId, User? author, string title, string content, Image? articleImage)
     {
-        var newArticle = new Article(id, authorId, title, content, articleImage);
+        var newArticle = new Article(id, authorId, author, title, content, articleImage);
 
         return Result.Success(newArticle);
     }

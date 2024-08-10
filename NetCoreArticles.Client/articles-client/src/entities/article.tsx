@@ -1,12 +1,12 @@
+import Image from "./image";
+import Author from "./author.tsx";
+
 export default interface Article {
     id: string,
-    authorId: string,
+    author: Author,
     title: string,
     content: string,
-    articleImage: {
-        articleId: string,
-        fileName: string
-    },
+    articleImage: Image
     views: number, 
     createdAt: Date
     updatedAt: Date

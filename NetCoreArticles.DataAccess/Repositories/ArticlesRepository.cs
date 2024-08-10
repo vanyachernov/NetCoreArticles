@@ -44,6 +44,7 @@ public class ArticlesRepository : IArticlesRepository
     public async Task<IEnumerable<Article>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var articleEntities = await _context.Articles
+            .Include(u => u.Author)
             .Include(a => a.ArticleImage)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
@@ -73,13 +74,28 @@ public class ArticlesRepository : IArticlesRepository
                 _logger.LogError("Article image is null or file name is empty for article with ID: " + articleEntity.Id);
             }
 
+            var userResult = User.Create(
+                articleEntity.Author.Id, 
+                articleEntity.Author.Username,
+                articleEntity.Author.Email, 
+                articleEntity.Author.PasswordHash
+            );
+
+            if (userResult.IsFailure)
+            {
+                _logger.LogError($"User has not been initialized. Errors: {userResult.Error}");
+            }
+
             var articleResult = Article.Create(
                 articleEntity.Id,
                 articleEntity.AuthorId,
+                userResult.Value,
                 articleEntity.Title,
                 articleEntity.Content,
                 articleImage
             );
+            
+            
 
             if (articleResult.IsFailure)
             {
@@ -97,6 +113,8 @@ public class ArticlesRepository : IArticlesRepository
     public async Task<Result<Article>> GetByIdAsync(Guid articleId, CancellationToken cancellationToken = default)
     {
         var articleEntity = await _context.Articles
+            .Include(a => a.Author)
+            .Include(a => a.ArticleImage)
             .AsNoTracking()
             .FirstOrDefaultAsync(a => a.Id == articleId, cancellationToken);
 
@@ -105,9 +123,22 @@ public class ArticlesRepository : IArticlesRepository
             return Result.Failure<Article>("Article not found!");
         }
         
+        var userResult = User.Create(
+            articleEntity.Author.Id, 
+            articleEntity.Author.Username,
+            articleEntity.Author.Email, 
+            articleEntity.Author.PasswordHash
+        );
+
+        if (userResult.IsFailure)
+        {
+            _logger.LogError($"User has not been initialized. Errors: {userResult.Error}");
+        }
+        
         var article = Article.Create(
             articleEntity.Id, 
-            articleEntity.AuthorId, 
+            articleEntity.AuthorId,
+            userResult.Value,
             articleEntity.Title,
             articleEntity.Content,
             Image.Create(articleEntity.ArticleImage.FileName).Value);

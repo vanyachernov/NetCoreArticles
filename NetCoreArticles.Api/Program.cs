@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using NetCoreArticles.Core.Abstractions;
 using NetCoreArticles.DataAccess;
 using NetCoreArticles.DataAccess.Repositories;
@@ -43,7 +44,13 @@ var app = builder.Build();
     }
 
     app.UseHttpsRedirection();
-    app.UseStaticFiles();
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(
+            Path.Combine(app.Environment.ContentRootPath, "StaticFiles/Images")
+        ),
+        RequestPath = "/articles/images"
+    });
     app.UseCors();
     app.MapControllers();
     app.Run();

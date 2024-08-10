@@ -1,5 +1,6 @@
 using CSharpFunctionalExtensions;
 using NetCoreArticles.Core.Abstractions;
+using NetCoreArticles.Core.Contracts;
 using NetCoreArticles.Core.Models;
 
 namespace NetCoreArticles.Infrastructure.Services;
@@ -22,20 +23,45 @@ public class ArticlesService : IArticlesService
             cancellationToken);
     }
 
-    public async Task<IEnumerable<Article>> GetAllArticlesAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ArticleResponse>> GetAllArticlesAsync(CancellationToken cancellationToken = default)
     {
-        return await _articlesRepository.GetAllAsync(cancellationToken);
+        var articlesData = await _articlesRepository.GetAllAsync(cancellationToken);
+        
+        var articlesDto = articlesData.Select(a => new ArticleResponse(
+            a.Id,
+            new UsersResponse(a.Author.Username, a.Author.Email),
+            a.Title,
+            a.Content,
+            a.Views,
+            a.CreatedAt,
+            a.UpdatedAt,
+            new ImagesResponse(a.ArticleImage?.FileName ?? string.Empty)
+        ));
+        
+        return articlesDto;
     }
 
-    public async Task<Article> GetArticleByIdAsync(
+    public async Task<ArticleResponse> GetArticleByIdAsync(
         Guid articleId, 
         CancellationToken cancellationToken = default)
     {
         var article = await _articlesRepository.GetByIdAsync(
             articleId, 
             cancellationToken);
+
+        var articleEntity = article.Value;
+
+        var articleDto = new ArticleResponse(
+            articleEntity.Id,
+            new UsersResponse(articleEntity.Author.Username, articleEntity.Author.Email),
+            articleEntity.Title,
+            articleEntity.Content,
+            articleEntity.Views,
+            articleEntity.CreatedAt,
+            articleEntity.UpdatedAt,
+            new ImagesResponse(articleEntity.ArticleImage?.FileName ?? string.Empty));
         
-        return article.Value;
+        return articleDto;
     }
 
     public Task<IQueryable<Article>> GetArticleByFilterAsync(
