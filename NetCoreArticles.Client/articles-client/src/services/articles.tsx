@@ -6,6 +6,7 @@ const baseUrl = "http://localhost:5212";
 export const fetchArticles = async () => {
     try {
         const articlesData = await axios.get(`${baseUrl}/api/articles`);
+        console.log(articlesData.data);
         return articlesData.data;
     } catch (exception) {
         console.error(exception);

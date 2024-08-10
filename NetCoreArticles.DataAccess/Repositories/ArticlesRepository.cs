@@ -143,6 +143,9 @@ public class ArticlesRepository : IArticlesRepository
             articleEntity.Title,
             articleEntity.Content,
             Image.Create(articleEntity.ArticleImage.FileName).Value);
+        
+        article.Value.SetCreatedDate(articleEntity.CreatedAt);
+        article.Value.SetUpdatedDate(articleEntity.UpdatedAt);
 
         return article;
     }

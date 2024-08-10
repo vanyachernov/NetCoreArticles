@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using NetCoreArticles.Core.Abstractions;
 using NetCoreArticles.DataAccess;
 using NetCoreArticles.DataAccess.Repositories;
@@ -23,6 +24,15 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
+    builder.Services.AddCors(options =>
+    {
+        options.AddDefaultPolicy(policy =>
+        {
+            policy.WithOrigins("http://localhost:5173");
+            policy.AllowAnyHeader();
+            policy.AllowAnyMethod();
+        });
+    });
 }
 
 var app = builder.Build();
