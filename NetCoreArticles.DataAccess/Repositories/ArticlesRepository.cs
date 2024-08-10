@@ -44,7 +44,7 @@ public class ArticlesRepository : IArticlesRepository
     public async Task<IEnumerable<Article>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var articleEntities = await _context.Articles
-            .Include(u => u.Author)
+            .Include(a => a.Author)
             .Include(a => a.ArticleImage)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
@@ -95,7 +95,8 @@ public class ArticlesRepository : IArticlesRepository
                 articleImage
             );
             
-            
+            articleResult.Value.SetCreatedDate(articleEntity.CreatedAt);
+            articleResult.Value.SetUpdatedDate(articleEntity.UpdatedAt);
 
             if (articleResult.IsFailure)
             {
