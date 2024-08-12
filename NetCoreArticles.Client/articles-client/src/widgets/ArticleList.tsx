@@ -1,25 +1,16 @@
-import {Avatar} from "@chakra-ui/react";
 import ArticleCard from "./ArticleCard.tsx";
-import {useEffect, useState} from "react";
-import {fetchArticles} from "../services/articles.tsx";
+import {Article} from "../entities/article.tsx";
 
-export default function ArticleList() {
-    const [articles, setArticles] = useState([]);
-    const [loading, setLoading] = useState(true);
+interface Props {
+    articles: Article[];
+    loading: boolean;
+}
 
-    useEffect(() => {
-        const fetchArticlesData = async () => {
-            const data = await fetchArticles();
-            setArticles(data);
-            setLoading(false);
-        }
-        fetchArticlesData();
-    }, []);
-    
+export default function ArticleList({articles, loading}: Props) {
     return (
         <div className="flex flex-row w-full lg:w-4/5 flex-wrap lg:justify-between gap-[20px]">
             {!loading ? articles.map((article) => (
-                <ArticleCard key={article.id} article={article} />
+                <ArticleCard key={article["id"]} article={article} />
             )) : (
                 <div>
                     No articles data.

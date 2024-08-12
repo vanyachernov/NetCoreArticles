@@ -1,12 +1,11 @@
 import axios from "axios";
-import {Article} from "../entities/article.tsx";
+import {ArticleRequest} from "../entities/article.tsx";
 
 const baseUrl = "http://localhost:5212";
 
 export const fetchArticles = async () => {
     try {
         const articlesData = await axios.get(`${baseUrl}/api/articles`);
-        console.log(articlesData.data);
         return articlesData.data;
     } catch (exception) {
         console.error(exception);
@@ -23,28 +22,33 @@ export const fetchArticleByIdentifier = async (articleId: string) => {
     }
 }
 
-export const createArticle = async (article: Article) => {
+export const createArticle = async (article: ArticleRequest) => {
     try {
-        const articleModel = [
-            article.Title,
-            article.Content
-        ];
-        const articleProcessingResult = await axios.post(`${baseUrl}/api/articles/create`, articleModel);
+        const formData = new FormData();
+        formData.append('authorId', article.authorId);
+        formData.append('title', article.title);
+        formData.append('content', article.content);
+        
+        if (article.titleImage) {
+            formData.append('titleImage', article.titleImage);
+        }
+        
+        const articleProcessingResult = await axios.post(`${baseUrl}/api/articles/create`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
         return articleProcessingResult.data;
     } catch (exception) {
         console.error(exception);
     }
 };
 
-export const updateArticle = async (article: Article) => {
+
+export const updateArticle = async (articleId: string, article: ArticleRequest) => {
     try {
-        const articleModel = [
-            article.AuthorId,
-            article.Title,
-            article.Content,
-            article.Image
-        ];
-        const articleProcessingResult = await axios.post(`${baseUrl}/api/articles/${article.Id}`, articleModel);
+        const articleProcessingResult = await axios.post(`${baseUrl}/api/articles/${articleId}`, JSON.stringify(article));
         return articleProcessingResult.data;
     } catch (exception) {
         console.error(exception);

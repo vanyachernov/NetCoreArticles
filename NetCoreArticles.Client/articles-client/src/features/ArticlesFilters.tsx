@@ -14,7 +14,7 @@ import {
 
 export default function ArticlesFilters() {
     return (
-        <div className="flex flex-col w-full lg:w-1/5 bg-white mr-0 lg:mr-6 rounded-lg shadow-md mb-6 lg:mb-0 h-full">
+        <div className="flex flex-col w-full lg:w-1/5 mr-0 lg:mr-6 mb-6 lg:mb-0 max-h-[800px]">
             <div className="p-6 flex-grow">
                 <h2 className="text-2xl font-bold hidden lg:block">Filters</h2>
                 <Accordion display={{base: "block", md: "block", lg: "none"}} allowToggle>
