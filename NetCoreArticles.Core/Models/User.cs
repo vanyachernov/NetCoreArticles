@@ -7,12 +7,13 @@ namespace NetCoreArticles.Core.Models;
 /// </summary>
 public class User
 {
-    private User(Guid id, string username, string email, string passwordHash)
+    private User(Guid id, string username, string email, string passwordHash, UserImage? userImage)
     {
         Id = id;
         Username = username;
         Email = email;
         PasswordHash = passwordHash;
+        UserImage = userImage;
     }
     
     /// <summary>
@@ -34,10 +35,15 @@ public class User
     /// Gets a user hash password.
     /// </summary>
     public string PasswordHash { get; }
+    
+    /// <summary>
+    /// Gets a user image.
+    /// </summary>
+    public UserImage? UserImage { get; }
 
-    public static Result<User> Create(Guid id, string username, string email, string passwordHash)
+    public static Result<User> Create(Guid id, string username, string email, string passwordHash, UserImage? userImage)
     {
-        var newUser = new User(id, username, email, passwordHash);
+        var newUser = new User(id, username, email, passwordHash, userImage);
 
         return Result.Success(newUser);
     }

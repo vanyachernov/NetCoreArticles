@@ -1,4 +1,3 @@
-using CSharpFunctionalExtensions;
 using NetCoreArticles.Core.Abstractions;
 using NetCoreArticles.Core.Contracts;
 using NetCoreArticles.Core.Models;
@@ -29,7 +28,7 @@ public class ArticlesService : IArticlesService
         
         var articlesDto = articlesData.Select(a => new ArticleResponse(
             a.Id,
-            new UsersResponse(a.Author.Username, a.Author.Email),
+            new UsersResponse(a.Author.Username, a.Author.Email, new ImagesResponse(a.Author?.UserImage?.FileName!)),
             a.Title,
             a.Content,
             a.Views,
@@ -53,7 +52,7 @@ public class ArticlesService : IArticlesService
 
         var articleDto = new ArticleResponse(
             articleEntity.Id,
-            new UsersResponse(articleEntity.Author.Username, articleEntity.Author.Email),
+            new UsersResponse(articleEntity.Author.Username, articleEntity.Author.Email, new ImagesResponse(articleEntity.Author.UserImage.FileName)),
             articleEntity.Title,
             articleEntity.Content,
             articleEntity.Views,

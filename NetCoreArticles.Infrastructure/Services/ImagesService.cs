@@ -20,55 +20,78 @@ public class ImagesService : IImagesService
         _environment = environment;
     }
 
-
-    public async Task<Result<Image>> CreateImage(
+    private async Task<Result<TImage>> CreateImage<TImage>(
         IFormFile imageFile,
-        CancellationToken cancellationToken = default)
+        Func<string, Result<TImage>> createImageFunc,
+        CancellationToken cancellationToken = default) where TImage : class
     {
         try
         {
             var contentPath = Path.Combine(_environment.ContentRootPath, "StaticFiles/Images");
-            
+
             if (!Directory.Exists(contentPath))
             {
                 Directory.CreateDirectory(contentPath);
             }
-            
+
             var ext = Path.GetExtension(imageFile.FileName);
             var allowedExtensions = new string[] { ".jpg", ".png", ".jpeg" };
-            
+
             if (!allowedExtensions.Contains(ext))
             {
                 var message = $"Only {string.Join(", ", allowedExtensions)} extensions are allowed";
-                return Result.Failure<Image>(message);
+                return Result.Failure<TImage>(message);
             }
 
             var uniqueString = Guid.NewGuid().ToString();
             var newFileName = uniqueString + ext;
             var filePath = Path.Combine(contentPath, newFileName);
-            
+
             await using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await imageFile.CopyToAsync(stream, cancellationToken);
             }
-            
-            var imageResult = Image.Create(newFileName);
+
+            var imageResult = createImageFunc(newFileName);
 
             if (imageResult.IsFailure)
             {
-                Result.Failure<Image>(imageResult.Error);
+                return Result.Failure<TImage>(imageResult.Error);
             }
-            
+
             return Result.Success(imageResult.Value);
         }
         catch (Exception ex)
         {
-            return Result.Failure<Image>(ex.Message);
+            return Result.Failure<TImage>(ex.Message);
         }
     }
-
-    public async Task<bool> SaveImage(Guid articleId, Image image, CancellationToken cancellationToken = default)
+    
+    public Task<Result<ArticleImage>> CreateArticleImage(
+        IFormFile imageFile,
+        CancellationToken cancellationToken = default)
     {
-        return await _imagesRepository.AddAsync(articleId, image, cancellationToken);
+        return CreateImage(
+            imageFile,
+            fileName => ArticleImage.Create(fileName),
+            cancellationToken
+        );
+    }
+
+    public Task<Result<UserImage>> CreateUserImage(
+        IFormFile imageFile,
+        CancellationToken cancellationToken = default)
+    {
+        return CreateImage(
+            imageFile,
+            fileName => UserImage.Create(fileName),
+            cancellationToken
+        );
+    }
+
+
+    public async Task<bool> SaveImage(Guid articleId, ArticleImage articleImage, CancellationToken cancellationToken = default)
+    {
+        return await _imagesRepository.AddAsync(articleId, articleImage, cancellationToken);
     }
 }

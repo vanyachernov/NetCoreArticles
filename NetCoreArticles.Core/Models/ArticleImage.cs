@@ -5,9 +5,9 @@ namespace NetCoreArticles.Core.Models;
 /// <summary>
 /// Represents an article's image.
 /// </summary>
-public class Image
+public class ArticleImage
 {
-    private Image(string fileName)
+    private ArticleImage(string fileName)
     {
         FileName = fileName;
     }
@@ -22,14 +22,14 @@ public class Image
     /// </summary>
     public string FileName { get; set; } = string.Empty;
 
-    public static Result<Image> Create(string fileName)
+    public static Result<ArticleImage> Create(string fileName)
     {
         if (string.IsNullOrEmpty(fileName))
         {
-            return Result.Failure<Image>($"{nameof(fileName)} cannot be null or empty");
+            return Result.Failure<ArticleImage>($"{nameof(fileName)} cannot be null or empty");
         }
 
-        var newImage = new Image(fileName);
+        var newImage = new ArticleImage(fileName);
 
         return Result.Success(newImage);
     }

@@ -7,7 +7,7 @@ namespace NetCoreArticles.Core.Models;
 /// </summary>
 public class Article
 {
-    private Article(Guid id, Guid authorId, User? author, string title, string content, Image? articleImage)
+    private Article(Guid id, Guid authorId, User? author, string title, string content, ArticleImage? articleImage)
     {
         Id = id;
         AuthorId = authorId;
@@ -60,7 +60,7 @@ public class Article
     /// <summary>
     /// Gets an article image.
     /// </summary>
-    public Image? ArticleImage { get; }
+    public ArticleImage? ArticleImage { get; }
     
     public void SetViews(int views) => Views = views;
     
@@ -68,7 +68,7 @@ public class Article
     
     public void SetUpdatedDate(DateTime updatedDate) => UpdatedAt = updatedDate;
 
-    public static Result<Article> Create(Guid id, Guid authorId, User? author, string title, string content, Image? articleImage)
+    public static Result<Article> Create(Guid id, Guid authorId, User? author, string title, string content, ArticleImage? articleImage)
     {
         var newArticle = new Article(id, authorId, author, title, content, articleImage);
 

@@ -46,7 +46,7 @@ public class ArticlesController : ControllerBase
         [FromForm] ArticlesRequest article,
         CancellationToken token)
     {
-        var imageProcessingResult = await _imagesService.CreateImage(
+        var imageProcessingResult = await _imagesService.CreateArticleImage(
             article.TitleImage,
             token);
 

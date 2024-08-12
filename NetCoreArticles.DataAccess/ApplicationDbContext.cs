@@ -10,6 +10,7 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<ArticleEntity> Articles { get; set; }
     public DbSet<ImageEntity> Images { get; set; }
+    public DbSet<UserImageEntity> UsersImages { get; set; }
     public DbSet<UserEntity> Users { get; set; }
     public DbSet<LikeEntity> Likes { get; set; }
 
@@ -17,6 +18,7 @@ public class ApplicationDbContext : DbContext
     {
         modelBuilder.ApplyConfiguration(new ArticleConfiguration());
         modelBuilder.ApplyConfiguration(new ImageConfiguration());
+        modelBuilder.ApplyConfiguration(new UsersImageConfiguration());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new LikeConfiguration());
         
