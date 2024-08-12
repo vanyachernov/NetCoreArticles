@@ -6,13 +6,10 @@ import {
     AccordionIcon,
     Box,
     Input,
-    RangeSlider,
-    RangeSliderTrack,
-    RangeSliderFilledTrack,
-    RangeSliderThumb
+    Select
 } from "@chakra-ui/react";
 
-export default function ArticlesFilters() {
+export default function ArticlesFilters({filters, setFilter}) {
     return (
         <div className="flex flex-col w-full lg:w-1/5 mr-0 lg:mr-6 mb-6 lg:mb-0 max-h-[800px]">
             <div className="p-6 flex-grow">
@@ -24,42 +21,52 @@ export default function ArticlesFilters() {
                             <AccordionIcon/>
                         </AccordionButton>
                         <AccordionPanel pb={4} className="mt-2">
-                            <Input type="text" placeholder="Article name"/>
+                            <Input
+                                type="text"
+                                placeholder="Article name"
+                                onChange={(e) => setFilter(prevFilters => ({
+                                    ...prevFilters,
+                                    search: e.target.value
+                                }))}
+                            />
                             <div className="pt-4">
-                                <div className="flex items-center justify-between text-center flex-row">
-                                    <Input disabled type="text" className="w-1/3"/>
-                                    <span className="w-1/3">-</span>
-                                    <Input disabled type="text" className="w-1/3"/>
-                                </div>
                                 <div className="pt-2">
-                                    <RangeSlider aria-label={['min', 'max']} colorScheme="teal" defaultValue={[0, 100]}>
-                                        <RangeSliderTrack>
-                                            <RangeSliderFilledTrack/>
-                                        </RangeSliderTrack>
-                                        <RangeSliderThumb index={0}/>
-                                        <RangeSliderThumb index={1}/>
-                                    </RangeSlider>
+                                    <Select
+                                        placeholder='By default'
+                                        onChange={(e) => setFilter(prevFilters => ({
+                                            ...prevFilters,
+                                            sortOrder: e.target.value
+                                        }))}
+                                    >
+                                        <option value='desc'>From new to old</option>
+                                        <option value='asc'>From old to new</option>
+                                    </Select>
                                 </div>
                             </div>
                         </AccordionPanel>
                     </AccordionItem>
                 </Accordion>
                 <div className="hidden lg:block pt-4">
-                    <Input type="text" placeholder="Article name"/>
+                    <Input
+                        type="text"
+                        placeholder="Article name"
+                        onChange={(e) => setFilter(prevFilters => ({
+                            ...prevFilters,
+                            search: e.target.value
+                        }))}
+                    />
                     <div className="pt-4">
-                        <div className="flex items-center justify-between text-center flex-row">
-                            <Input disabled type="text" className="w-1/3"/>
-                            <span className="w-1/3">-</span>
-                            <Input disabled type="text" className="w-1/3"/>
-                        </div>
                         <div className="pt-2">
-                            <RangeSlider aria-label={['min', 'max']} colorScheme="teal" defaultValue={[0, 100]}>
-                                <RangeSliderTrack>
-                                    <RangeSliderFilledTrack/>
-                                </RangeSliderTrack>
-                                <RangeSliderThumb index={0}/>
-                                <RangeSliderThumb index={1}/>
-                            </RangeSlider>
+                            <Select
+                                placeholder='By default'
+                                onChange={(e) => setFilter(prevFilters => ({
+                                    ...prevFilters,
+                                    sortOrder: e.target.value
+                                }))}
+                            >
+                                <option value='desc'>From new to old</option>
+                                <option value='asc'>From old to new</option>
+                            </Select>
                         </div>
                     </div>
                 </div>

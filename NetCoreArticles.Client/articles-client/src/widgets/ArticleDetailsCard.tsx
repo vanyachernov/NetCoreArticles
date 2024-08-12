@@ -1,6 +1,6 @@
 import {Avatar} from "@chakra-ui/react";
 import moment from "moment";
-import Article from "../entities/article.tsx";
+import {Article} from "../entities/article.tsx";
 import {BsBarChartFill} from "react-icons/bs";
 
 interface ArticleProps {
@@ -15,7 +15,7 @@ export default function ArticleDetailsCard({article}: ArticleProps) {
             <img
                 src={`${baseUrl}/${article.image.fileName}`}
                 alt={article.title}
-                className="max-w-full max-h-[500px] overflow-hidden object-cover shadow-md mb-5"
+                className="max-w-full max-h-[500px] h-[300px] overflow-hidden object-cover shadow-md mb-5"
             />
 
             <div className="flex items-center justify-between max-w-md w-full mb-6">

@@ -22,9 +22,9 @@ public class ArticlesService : IArticlesService
             cancellationToken);
     }
 
-    public async Task<IEnumerable<ArticleResponse>> GetAllArticlesAsync(CancellationToken cancellationToken = default)
+    public async Task<ICollection<ArticleResponse>> GetAllArticlesAsync(GetArticlesRequest request, CancellationToken cancellationToken = default)
     {
-        var articlesData = await _articlesRepository.GetAllAsync(cancellationToken);
+        var articlesData = await _articlesRepository.GetAllAsync(request, cancellationToken);
         
         var articlesDto = articlesData.Select(a => new ArticleResponse(
             a.Id,
@@ -37,7 +37,7 @@ public class ArticlesService : IArticlesService
             new ImagesResponse(a.ArticleImage?.FileName ?? string.Empty)
         ));
         
-        return articlesDto;
+        return articlesDto.ToList();
     }
 
     public async Task<ArticleResponse> GetArticleByIdAsync(

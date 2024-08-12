@@ -18,16 +18,22 @@ export default function ArticleDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const {isOpen,onOpen,onClose} = useDisclosure();
-    
-    useEffect(() => {
-        const loadArticle = async () => {
-            const fetchedArticle = await fetchArticleByIdentifier(id!);
 
-            setLoading(false);
-            setArticle(fetchedArticle);
+    useEffect(() => {
+        let isMounted = true;
+        const loadArticle = async () => {
+            if (isMounted) {
+                const fetchedArticle = await fetchArticleByIdentifier(id!);
+                setLoading(false);
+                setArticle(fetchedArticle);
+            }
         };
-        
+
         loadArticle();
+
+        return () => {
+            isMounted = false;
+        };
     }, [id]);
 
     const handleDeleteArticle = async (id: string) => {
@@ -58,7 +64,7 @@ export default function ArticleDetails() {
                             <MdDeleteOutline/> Delete article
                         </Button>
                     </div>
-                    <h1 className="text-center text-4xl font-bold mb-8">{article?.title}</h1>
+                    <h1 className="text-center text-4xl font-bold pt-10 pb-12">{article?.title}</h1>
                     <div className="px-30 flex justify-center">
                         {!loading ? (
                             <ArticleDetailsCard article={article}/>

@@ -1,8 +1,9 @@
 import ArticleManage, {Mode} from "../features/ArticleManage.tsx";
-import {useDisclosure} from "@chakra-ui/react";
+import {useDisclosure, useToast} from "@chakra-ui/react";
 import {useState} from "react";
 import {Article, ArticleRequest} from "../entities/article.tsx";
 import {useNavigate} from "react-router-dom";
+import ArticleStatusToast from "../features/ArticleStatusToast.tsx";
 
 interface Props {
     onCreateArticle: (request: ArticleRequest) => void;
@@ -26,11 +27,22 @@ export default function Header({onCreateArticle}: Props) {
     } as Article;
     const [article, setArticle] = useState<Article>(defaultValues);
     const navigate = useNavigate();
+    const toast = useToast();
     
     const handleCreateArticle = async (request: ArticleRequest) => {
         await onCreateArticle(request);
         setArticle(defaultValues);
         onClose();
+
+        
+        toast({
+            title: 'Article created.',
+            description: "You're successfully created a new article!",
+            status: 'success',
+            position: "bottom-right",
+            duration: 5000,
+            isClosable: true,
+        });
     };
 
     const handleUpdateArticle = async (id: string,  request: ArticleRequest) => {
@@ -42,7 +54,7 @@ export default function Header({onCreateArticle}: Props) {
         <header className="container mx-auto px-4 lg:px-0">
             <div className="flex justify-between items-center pt-5">
                 <a className="font-bold text-3xl cursor-pointer" onClick={(e) => {
-                    navigate("/articles"); // Navigate back
+                    navigate("/"); // Navigate back
                 }}>Copywriter</a>
                 <div className="space-x-5 align-middle">
                     <a href="#" onClick={onOpen} className="cursor-pointer hover:text-teal-400 transition duration-200">New

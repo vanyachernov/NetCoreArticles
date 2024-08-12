@@ -7,14 +7,12 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ArticleDetails from "./pages/ArticleDetails.tsx";
 
 createRoot(document.getElementById("root")!).render(
-    <StrictMode>
-        <ChakraProvider>
-            <Router>
-                <Routes>
-                    <Route path="/articles" element={<Articles />} />
-                    <Route path="/articles/:id" element={<ArticleDetails />} />
-                </Routes>
-            </Router>
-        </ChakraProvider>
-    </StrictMode>
+    <ChakraProvider>
+        <Router>
+            <Routes>
+                <Route path="/articles" element={<Articles />} />
+                <Route path="/articles/:id" element={<ArticleDetails />} />
+            </Routes>
+        </Router>
+    </ChakraProvider>
 );

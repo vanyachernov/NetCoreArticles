@@ -22,9 +22,13 @@ public class ArticlesController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ArticleResponse>>> GetArticles(CancellationToken token)
+    public async Task<ActionResult<IEnumerable<ArticleResponse>>> GetArticles(
+        [FromQuery] GetArticlesRequest articleParams,
+        CancellationToken token)
     {
-        var articles = await _articlesService.GetAllArticlesAsync(token);
+        var articles = await _articlesService.GetAllArticlesAsync(
+            articleParams, 
+            token);
         
         return Ok(articles);
     }
@@ -43,7 +47,7 @@ public class ArticlesController : ControllerBase
     [HttpPost]
     [Route("create")]
     public async Task<ActionResult<Article>> CreateArticle(
-        [FromForm] ArticlesRequest article,
+        [FromForm] CreateArticlesRequest article,
         CancellationToken token)
     {
         var imageProcessingResult = await _imagesService.CreateArticleImage(

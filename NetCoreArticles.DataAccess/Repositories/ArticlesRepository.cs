@@ -1,7 +1,9 @@
+using System.Linq.Expressions;
 using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NetCoreArticles.Core.Abstractions;
+using NetCoreArticles.Core.Contracts;
 using NetCoreArticles.Core.Models;
 using NetCoreArticles.DataAccess.Entities;
 
@@ -40,7 +42,9 @@ public class ArticlesRepository : IArticlesRepository
         return article; 
     }
 
-    public async Task<IEnumerable<Article>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<ICollection<Article>> GetAllAsync(
+        GetArticlesRequest request, 
+        CancellationToken cancellationToken = default)
     {
         var articleEntities = await _context.Articles
             .Include(a => a.Author)
@@ -48,10 +52,25 @@ public class ArticlesRepository : IArticlesRepository
             .Include(a => a.ArticleImage)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
+        
+        var filteredArticles = articleEntities
+            .Where(a => string.IsNullOrWhiteSpace(request.Search) || 
+                        a.Title.ToLower().Contains(request.Search.ToLower()));
+
+        Expression<Func<ArticleEntity, object>> selectorKey = request.SortItem?.ToLower() switch
+        {
+            "date" => article => article.CreatedAt,
+            "title" => article => article.Title,
+            _ => article => article.Id
+        };
+
+        filteredArticles = request.SortOrder == "desc"
+            ? filteredArticles.OrderByDescending(selectorKey.Compile())
+            : filteredArticles.OrderBy(selectorKey.Compile());
 
         var articles = new List<Article>();
 
-        foreach (var articleEntity in articleEntities)
+        foreach (var articleEntity in filteredArticles)
         {
             ArticleImage? articleImage = null;
             UserImage? userImage = null;
@@ -101,7 +120,7 @@ public class ArticlesRepository : IArticlesRepository
                 articleImage
             );
             
-            articleResult.Value.SetViews(articleEntity.Views + 1);
+            articleResult.Value.SetViews(articleEntity.Views);
             articleResult.Value.SetCreatedDate(articleEntity.CreatedAt);
             articleResult.Value.SetUpdatedDate(articleEntity.UpdatedAt);
 
@@ -118,90 +137,96 @@ public class ArticlesRepository : IArticlesRepository
 
 
 
-    public async Task<Result<Article>> GetByIdAsync(Guid articleId, CancellationToken cancellationToken = default)
-{
-    var articleEntity = await _context.Articles
-        .Include(a => a.Author)
-            .ThenInclude(u => u.UserImage)
-        .Include(a => a.ArticleImage)
-        .AsNoTracking()
-        .FirstOrDefaultAsync(a => a.Id == articleId, cancellationToken);
 
-    if (articleEntity == null)
+    public async Task<Result<Article>> GetByIdAsync(
+        Guid articleId, 
+        CancellationToken cancellationToken = default)
     {
-        return Result.Failure<Article>("Article not found!");
-    }
-    
-    Result<UserImage> userImageResult;
-    if (articleEntity.Author.UserImage != null && !string.IsNullOrEmpty(articleEntity.Author.UserImage.FileName))
-    {
-        userImageResult = UserImage.Create(articleEntity.Author.UserImage.FileName);
-        if (userImageResult.IsFailure)
+        var articleEntity = await _context.Articles
+            .Include(a => a.Author)
+                .ThenInclude(u => u.UserImage)
+            .Include(a => a.ArticleImage)
+            .FirstOrDefaultAsync(a => a.Id == articleId, cancellationToken);
+
+        if (articleEntity == null)
         {
-            _logger.LogError(userImageResult.Error);
-            return Result.Failure<Article>("Invalid user image data.");
+            return Result.Failure<Article>("Article not found!");
         }
+        
+        Result<UserImage> userImageResult;
+        if (articleEntity.Author.UserImage != null && !string.IsNullOrEmpty(articleEntity.Author.UserImage.FileName))
+        {
+            userImageResult = UserImage.Create(articleEntity.Author.UserImage.FileName);
+            if (userImageResult.IsFailure)
+            {
+                _logger.LogError(userImageResult.Error);
+                return Result.Failure<Article>("Invalid user image data.");
+            }
+        }
+        else
+        {
+            _logger.LogError("User image is null or file name is empty for user with ID: " + articleEntity.Author.Id);
+            userImageResult = Result.Failure<UserImage>("User image data is missing.");
+        }
+
+        var userImage = userImageResult.Value;
+        userImage.UserId = articleEntity.AuthorId;
+
+        await AddViewToArticle(articleEntity, cancellationToken);
+        
+        var userResult = User.Create(
+            articleEntity.Author.Id,
+            articleEntity.Author.Username,
+            articleEntity.Author.Email,
+            articleEntity.Author.PasswordHash,
+            userImage
+        );
+
+        if (userResult.IsFailure)
+        {
+            _logger.LogError($"User creation failed. Errors: {userResult.Error}");
+            return Result.Failure<Article>("User creation failed.");
+        }
+        
+        var articleImageResult = ArticleImage.Create(articleEntity.ArticleImage?.FileName ?? string.Empty);
+        if (articleImageResult.IsFailure)
+        {
+            _logger.LogError(articleImageResult.Error);
+            return Result.Failure<Article>("Invalid article image data.");
+        }
+
+        var article = Article.Create(
+            articleEntity.Id,
+            articleEntity.AuthorId,
+            userResult.Value,
+            articleEntity.Title,
+            articleEntity.Content,
+            articleImageResult.Value
+        );
+
+        if (article.IsFailure)
+        {
+            _logger.LogError($"Article creation failed. Errors: {article.Error}");
+            return Result.Failure<Article>("Article creation failed.");
+        }
+        
+        article.Value.SetViews(articleEntity.Views);
+        article.Value.SetCreatedDate(articleEntity.CreatedAt);
+        article.Value.SetUpdatedDate(articleEntity.UpdatedAt);
+
+        return article;
     }
-    else
-    {
-        _logger.LogError("User image is null or file name is empty for user with ID: " + articleEntity.Author.Id);
-        userImageResult = Result.Failure<UserImage>("User image data is missing.");
-    }
 
-    var userImage = userImageResult.Value;
-    userImage.UserId = articleEntity.AuthorId;
-    
-    await AddViewToArticle(articleId, cancellationToken);
-    
-    var userResult = User.Create(
-        articleEntity.Author.Id,
-        articleEntity.Author.Username,
-        articleEntity.Author.Email,
-        articleEntity.Author.PasswordHash,
-        userImage
-    );
-
-    if (userResult.IsFailure)
-    {
-        _logger.LogError($"User creation failed. Errors: {userResult.Error}");
-        return Result.Failure<Article>("User creation failed.");
-    }
-    
-    var articleImageResult = ArticleImage.Create(articleEntity.ArticleImage?.FileName ?? string.Empty);
-    if (articleImageResult.IsFailure)
-    {
-        _logger.LogError(articleImageResult.Error);
-        return Result.Failure<Article>("Invalid article image data.");
-    }
-
-    var article = Article.Create(
-        articleEntity.Id,
-        articleEntity.AuthorId,
-        userResult.Value,
-        articleEntity.Title,
-        articleEntity.Content,
-        articleImageResult.Value
-    );
-
-    if (article.IsFailure)
-    {
-        _logger.LogError($"Article creation failed. Errors: {article.Error}");
-        return Result.Failure<Article>("Article creation failed.");
-    }
-    
-    article.Value.SetViews(articleEntity.Views + 1);
-    article.Value.SetCreatedDate(articleEntity.CreatedAt);
-    article.Value.SetUpdatedDate(articleEntity.UpdatedAt);
-
-    return article;
-}
-
-    public Task<IQueryable<Article>> GetByFilterAsync(string title, CancellationToken cancellationToken = default)
+    public Task<IQueryable<Article>> GetByFilterAsync(
+        string title, 
+        CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<Article> UpdateAsync(Article article, CancellationToken cancellationToken = default)
+    public async Task<Article> UpdateAsync(
+        Article article, 
+        CancellationToken cancellationToken = default)
     {
         await _context.Articles
             .Where(a => a.Id == article.Id)
@@ -213,7 +238,9 @@ public class ArticlesRepository : IArticlesRepository
         return article;
     }
 
-    public async Task<Guid> DeleteAsync(Guid articleId, CancellationToken cancellationToken = default)
+    public async Task<Guid> DeleteAsync(
+        Guid articleId, 
+        CancellationToken cancellationToken = default)
     {
         await _context.Articles
             .Where(a => a.Id == articleId)
@@ -222,13 +249,11 @@ public class ArticlesRepository : IArticlesRepository
         return articleId;
     }
 
-    public async Task AddViewToArticle(Guid articleId, CancellationToken cancellationToken = default)
+    private async Task AddViewToArticle(
+        ArticleEntity entity, 
+        CancellationToken cancellationToken = default)
     {
-        var article = await _context.Articles.FirstOrDefaultAsync(a => a.Id == articleId, cancellationToken);
-
-        var newViewValue = article!.Views + 1;
-
-        article.Views = newViewValue;
+        entity.Views = entity.Views + 1;
 
         await _context.SaveChangesAsync(cancellationToken);
     }
