@@ -13,9 +13,12 @@ export default function Articles() {
     
     const loadArticles = async () => {
         const fetchedArticles = await fetchArticles();
+        const sortedArticles = fetchedArticles.sort((a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
         
         setLoading(false);
-        setArticles(fetchedArticles);
+        setArticles(sortedArticles);
     };
     
     useEffect(() => {

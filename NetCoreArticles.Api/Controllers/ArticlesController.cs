@@ -81,4 +81,15 @@ public class ArticlesController : ControllerBase
 
          return newArticle.Value;
     }
+    
+    [HttpDelete]
+    [Route("{articleId:guid}")]
+    public async Task<ActionResult<Guid>> DeleteArticle(
+        [FromRoute] Guid articleId,
+        CancellationToken token)
+    {
+        var article = await _articlesService.DeleteArticleAsync(articleId, token);
+            
+        return article;
+    }
 }

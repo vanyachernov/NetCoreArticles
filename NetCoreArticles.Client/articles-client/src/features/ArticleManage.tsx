@@ -103,11 +103,11 @@ export default function ArticleManage({ mode, article, isModalOpen, handleCancel
                 <ModalBody pb={6}>
                     <FormControl>
                         <FormLabel>Title</FormLabel>
-                        <Input onChange={(e) => setTitle(e.target.value)} placeholder='Article title' />
+                        <Input onChange={(e) => setTitle(e.target.value)} placeholder='Article title' required />
                     </FormControl>
                     <FormControl mt={4}>
                         <FormLabel>Content</FormLabel>
-                        <Textarea onChange={(e) => setContent(e.target.value)} placeholder='Article content' />
+                        <Textarea onChange={(e) => setContent(e.target.value)} placeholder='Article content' required />
                     </FormControl>
                     <FormControl mt={4}>
                         <FormLabel>Image</FormLabel>
