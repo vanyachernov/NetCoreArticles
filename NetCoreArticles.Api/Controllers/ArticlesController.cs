@@ -22,9 +22,13 @@ public class ArticlesController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ArticleResponse>>> GetArticles(CancellationToken token)
+    public async Task<ActionResult<IEnumerable<ArticleResponse>>> GetArticles(
+        [FromQuery] GetArticlesRequest articleParams,
+        CancellationToken token)
     {
-        var articles = await _articlesService.GetAllArticlesAsync(token);
+        var articles = await _articlesService.GetAllArticlesAsync(
+            articleParams, 
+            token);
         
         return Ok(articles);
     }
@@ -43,10 +47,10 @@ public class ArticlesController : ControllerBase
     [HttpPost]
     [Route("create")]
     public async Task<ActionResult<Article>> CreateArticle(
-        [FromForm] ArticlesRequest article,
+        [FromForm] CreateArticlesRequest article,
         CancellationToken token)
     {
-        var imageProcessingResult = await _imagesService.CreateImage(
+        var imageProcessingResult = await _imagesService.CreateArticleImage(
             article.TitleImage,
             token);
 
@@ -80,5 +84,16 @@ public class ArticlesController : ControllerBase
          }
 
          return newArticle.Value;
+    }
+    
+    [HttpDelete]
+    [Route("{articleId:guid}")]
+    public async Task<ActionResult<Guid>> DeleteArticle(
+        [FromRoute] Guid articleId,
+        CancellationToken token)
+    {
+        var article = await _articlesService.DeleteArticleAsync(articleId, token);
+            
+        return article;
     }
 }

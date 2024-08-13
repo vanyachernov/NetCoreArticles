@@ -3,9 +3,15 @@ import {ArticleRequest} from "../entities/article.tsx";
 
 const baseUrl = "http://localhost:5212";
 
-export const fetchArticles = async () => {
+export const fetchArticles = async (filter) => {
     try {
-        const articlesData = await axios.get(`${baseUrl}/api/articles`);
+        const articlesData = await axios.get(`${baseUrl}/api/articles`, {
+            params: {
+                search: filter?.search,
+                sortItem: filter?.sortItem,
+                sortOrder: filter?.sortOrder
+            }
+        });
         return articlesData.data;
     } catch (exception) {
         console.error(exception);

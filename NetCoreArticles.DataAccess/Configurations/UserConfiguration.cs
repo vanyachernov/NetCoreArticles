@@ -22,6 +22,11 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
             .Property(u => u.PasswordHash)
             .IsRequired();
         builder
+            .HasOne(u => u.UserImage)
+            .WithOne(i => i.User)
+            .HasForeignKey<UserImageEntity>(i => i.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder
             .HasMany(u => u.Likes)
             .WithOne(l => l.User)
             .HasForeignKey(l => l.UserId)

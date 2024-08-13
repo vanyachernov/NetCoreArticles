@@ -24,6 +24,11 @@ public class UserEntity
     /// Gets or sets a user hash password.
     /// </summary>
     public string PasswordHash { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a user image.
+    /// </summary>
+    public UserImageEntity? UserImage { get; set; }
 
     /// <summary>
     /// Gets or sets a user likes collection.

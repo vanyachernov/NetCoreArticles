@@ -45,25 +45,40 @@ public class UsersRepository : IUsersRepository
     public async Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var userEntities = await _context.Users
+            .Include(u => u.UserImage)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
-        
-        var users = userEntities.Select(u => User.Create(
-                u.Id,
-                u.Username,
-                u.Email,
-                u.PasswordHash
-            ))
-            .Where(r => r.IsSuccess)
-            .Select(r => r.Value)
+    
+        var users = userEntities.Select(u =>
+            {
+                var userImageResult = UserImage.Create(u.UserImage.FileName);
+                
+                if (userImageResult.IsSuccess)
+                {
+                    return User.Create(
+                        u.Id,
+                        u.Username,
+                        u.Email,
+                        u.PasswordHash,
+                        userImageResult.Value
+                    ).Value;
+                }
+                else
+                {
+                    return null;
+                }
+            })
+            .Where(r => r != null)
             .ToList();
 
         return users;
     }
 
+
     public async Task<Result<User>> GetByIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var userEntity = await _context.Users
+            .Include(u => u.UserImage)
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
@@ -71,13 +86,23 @@ public class UsersRepository : IUsersRepository
         {
             return Result.Failure<User>("User not found!");
         }
-        
+
+        var userImageResult = UserImage.Create(userEntity.UserImage?.FileName);
+
+        if (userImageResult.IsFailure)
+        {
+            return Result.Failure<User>("Invalid user image data.");
+        }
+
         var user = User.Create(
             userEntity.Id,
             userEntity.Username,
             userEntity.Email,
-            userEntity.PasswordHash);
+            userEntity.PasswordHash,
+            userImageResult.Value
+        );
 
         return user;
     }
+
 }

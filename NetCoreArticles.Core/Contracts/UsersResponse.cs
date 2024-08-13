@@ -2,4 +2,5 @@ namespace NetCoreArticles.Core.Contracts;
 
 public record UsersResponse(
     string Username,
-    string Email);
+    string Email,
+    ImagesResponse Image);

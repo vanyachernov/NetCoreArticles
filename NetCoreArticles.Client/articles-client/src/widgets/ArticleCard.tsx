@@ -24,16 +24,16 @@ export default function ArticleCard({article}: ArticleProps) {
                 <h2 className="text-[18px] font-bold mb-2 line-clamp-2">{article.title}</h2>
                 <div className="flex items-center justify-between mt-4">
                     <div className="flex items-center">
-                        <Avatar className="mr-3" name={article.author.id} src={`${baseUrl}/${article.image.fileName}`}/>
+                        <Avatar className="mr-3" name={article.author.username} src={`${baseUrl}/${article.author.image.fileName}`} />
                         <div className="text-sm">
                             <p className="text-gray-900 md:max-w-full lg:max-w-[300px] leading-4">{article.author.username}</p>
-                            <p className="text-gray-600 mt-2">{moment(article.createdAt).format("DD.MM.YYYY hh:mm")}</p>
+                            <p className="text-gray-600 mt-2">{moment(article.createdAt).format("DD.MM.YYYY HH:mm")}</p>
                         </div>
                     </div>
                     <div className="text-gray-600 flex items-center">
                         <BsBarChartFill className="mr-2"/>
                         <div className="flex items-center gap-1">
-                            <span className="text-[14px]">{article.views - 1}</span>
+                            <span className="text-[14px]">{article.views}</span>
                             <span className="text-[14px]">views</span>
                         </div>
                     </div>

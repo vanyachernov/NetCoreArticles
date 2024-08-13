@@ -10,13 +10,16 @@ namespace NetCoreArticles.Api.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUsersService _usersService;
+    private readonly IImagesService _imagesService;
     private readonly IPasswordHasherService _passwordHasherService;
 
     public UsersController(
         IUsersService usersService,
+        IImagesService imagesService,
         IPasswordHasherService passwordHasherService)
     {
         _usersService = usersService;
+        _imagesService = imagesService;
         _passwordHasherService = passwordHasherService;
     }
 
@@ -49,14 +52,24 @@ public class UsersController : ControllerBase
     [HttpPost]
     [Route("create")]
     public async Task<ActionResult<User>> CreateUser(
-        UsersRequest user,
+        [FromForm] UsersRequest user,
         CancellationToken token)
     {
+        var imageProcessingResult = await _imagesService.CreateUserImage(
+            user.UserImage,
+            token);
+
+        if (imageProcessingResult.IsFailure)
+        {
+            return BadRequest(imageProcessingResult.Error);
+        }
+        
         var userProcessingResult = Core.Models.User.Create(
             Guid.NewGuid(),
             user.Username,
             user.Email,
-            _passwordHasherService.Generate(user.Password));
+            _passwordHasherService.Generate(user.Password), 
+            imageProcessingResult.Value);
 
         if (userProcessingResult.IsFailure)
         {

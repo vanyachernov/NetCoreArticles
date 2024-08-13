@@ -9,10 +9,15 @@ import Footer from "../shared/Footer.tsx";
 
 export default function Articles() {
     const [articles, setArticles] = useState<Article[]>([]);
+    const [filters, setFilters] = useState({
+        search: "",
+        sortItem: "date",
+        sortOrder: "asc",
+    });
     const [loading, setLoading] = useState(true);
     
     const loadArticles = async () => {
-        const fetchedArticles = await fetchArticles();
+        const fetchedArticles = await fetchArticles(filters);
         
         setLoading(false);
         setArticles(fetchedArticles);
@@ -20,7 +25,7 @@ export default function Articles() {
     
     useEffect(() => {
         loadArticles();
-    }, []);
+    }, [filters]);
     
     const handleCreateArticle = async (request: ArticleRequest) => {
         await createArticle(request);
@@ -35,7 +40,7 @@ export default function Articles() {
                     <h1 className="text-center text-4xl font-bold">Articles</h1>
                     <div className="pt-6">
                         <div className="flex flex-col w-full lg:flex-row h-full">
-                            <ArticlesFilters />
+                            <ArticlesFilters filters={filters} setFilter={setFilters} />
                             <ArticleList articles={articles} loading={loading} />
                         </div>
                     </div>

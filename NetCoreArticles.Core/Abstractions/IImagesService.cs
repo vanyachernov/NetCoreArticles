@@ -6,6 +6,7 @@ namespace NetCoreArticles.Core.Abstractions;
 
 public interface IImagesService
 {
-    Task<Result<Image>> CreateImage(IFormFile imageFile, CancellationToken cancellationToken = default);
-    Task<bool> SaveImage(Guid articleId, Image image, CancellationToken cancellationToken = default);
+    Task<Result<ArticleImage>> CreateArticleImage(IFormFile imageFile, CancellationToken cancellationToken = default);
+    Task<Result<UserImage>> CreateUserImage(IFormFile imageFile, CancellationToken cancellationToken = default);
+    Task<bool> SaveImage(Guid articleId, ArticleImage articleImage, CancellationToken cancellationToken = default);
 }

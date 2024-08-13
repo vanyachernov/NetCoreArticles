@@ -6,4 +6,5 @@ namespace NetCoreArticles.Core.Contracts;
 public record UsersRequest(
     [Required] [MaxLength(60)] string Username,
     [Required] [MaxLength(255)] string Email,
-    [Required] string Password);
+    [Required] string Password,
+    IFormFile UserImage);

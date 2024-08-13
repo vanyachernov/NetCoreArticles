@@ -1,4 +1,3 @@
-using CSharpFunctionalExtensions;
 using NetCoreArticles.Core.Abstractions;
 using NetCoreArticles.Core.Contracts;
 using NetCoreArticles.Core.Models;
@@ -23,13 +22,13 @@ public class ArticlesService : IArticlesService
             cancellationToken);
     }
 
-    public async Task<IEnumerable<ArticleResponse>> GetAllArticlesAsync(CancellationToken cancellationToken = default)
+    public async Task<ICollection<ArticleResponse>> GetAllArticlesAsync(GetArticlesRequest request, CancellationToken cancellationToken = default)
     {
-        var articlesData = await _articlesRepository.GetAllAsync(cancellationToken);
+        var articlesData = await _articlesRepository.GetAllAsync(request, cancellationToken);
         
         var articlesDto = articlesData.Select(a => new ArticleResponse(
             a.Id,
-            new UsersResponse(a.Author.Username, a.Author.Email),
+            new UsersResponse(a.Author.Username, a.Author.Email, new ImagesResponse(a.Author?.UserImage?.FileName!)),
             a.Title,
             a.Content,
             a.Views,
@@ -38,7 +37,7 @@ public class ArticlesService : IArticlesService
             new ImagesResponse(a.ArticleImage?.FileName ?? string.Empty)
         ));
         
-        return articlesDto;
+        return articlesDto.ToList();
     }
 
     public async Task<ArticleResponse> GetArticleByIdAsync(
@@ -53,7 +52,7 @@ public class ArticlesService : IArticlesService
 
         var articleDto = new ArticleResponse(
             articleEntity.Id,
-            new UsersResponse(articleEntity.Author.Username, articleEntity.Author.Email),
+            new UsersResponse(articleEntity.Author.Username, articleEntity.Author.Email, new ImagesResponse(articleEntity.Author.UserImage.FileName)),
             articleEntity.Title,
             articleEntity.Content,
             articleEntity.Views,

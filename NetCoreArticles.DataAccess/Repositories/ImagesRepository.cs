@@ -14,12 +14,12 @@ public class ImagesRepository : IImagesRepository
         _context = context;
     }
     
-    public async Task<bool> AddAsync(Guid articleId, Image image, CancellationToken cancellationToken = default)
+    public async Task<bool> AddAsync(Guid articleId, ArticleImage articleImage, CancellationToken cancellationToken = default)
     {
         var imageEntity = new ImageEntity
         {
             ArticleId = articleId,
-            FileName = image.FileName
+            FileName = articleImage.FileName
         };
 
         await _context.Images
