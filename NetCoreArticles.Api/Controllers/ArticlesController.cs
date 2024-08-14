@@ -22,7 +22,7 @@ public class ArticlesController : ControllerBase
     }
     
     [HttpGet]
-    [AllowAnonymous]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<ArticleResponse>>> GetArticles(
         [FromQuery] GetArticlesRequest articleParams,
         CancellationToken token)
@@ -36,7 +36,6 @@ public class ArticlesController : ControllerBase
 
     [HttpGet]
     [Route("{articleId:guid}")]
-    [AllowAnonymous]
     public async Task<ActionResult<ArticleResponse>> GetArticleByIdentifier(
         [FromRoute] Guid articleId,
         CancellationToken token)
@@ -48,7 +47,6 @@ public class ArticlesController : ControllerBase
 
     [HttpPost]
     [Route("create")]
-    [Authorize(Roles = "Admin, Creator")]
     public async Task<ActionResult<Article>> CreateArticle(
         [FromForm] CreateArticlesRequest article,
         CancellationToken token)
@@ -91,7 +89,6 @@ public class ArticlesController : ControllerBase
     
     [HttpDelete]
     [Route("{articleId:guid}")]
-    [Authorize(Roles = "Admin, Creator")]
     public async Task<ActionResult<Guid>> DeleteArticle(
         [FromRoute] Guid articleId,
         CancellationToken token)

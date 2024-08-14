@@ -8,3 +8,13 @@ public record UsersRequest(
     [Required] [MaxLength(255)] string Email,
     [Required] string Password,
     IFormFile UserImage);
+
+public record UserAuthenticationRequestDto(
+    [Required(ErrorMessage = "Email is required")] string Email,
+    [Required(ErrorMessage = "Password is required")] string Password);
+    
+public record AuthResponseDto(
+    bool IsAuthSuccessful,
+    string? ErrorMessage,
+    string? Token);
+    

@@ -1,7 +1,9 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.OpenApi.Models;
+using Microsoft.IdentityModel.Tokens;
 using NetCoreArticles.Core.Abstractions;
 using NetCoreArticles.DataAccess;
 using NetCoreArticles.DataAccess.Entities;
@@ -26,6 +28,29 @@ var builder = WebApplication.CreateBuilder(args);
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["validIssuer"],
+            ValidAudience = jwtSettings["validAudience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
+                .GetBytes(jwtSettings.GetSection("securityKey").Value!))
+        };
+    });
+
+    builder.Services.AddSingleton<JwtHandler>();
     
     builder.Services.AddScoped<IArticlesRepository, ArticlesRepository>();
     builder.Services.AddScoped<ILikesRepository, LikesRepository>();
@@ -58,6 +83,8 @@ var app = builder.Build();
         RequestPath = "/articles/images"
     });
     app.UseCors();
+    app.UseAuthentication();
+    app.UseAuthorization();
     app.MapControllers();
     app.Run();
 }
