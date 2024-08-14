@@ -9,19 +9,6 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
     public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
         builder
-            .HasKey(u => u.Id);
-        builder
-            .Property(u => u.Username)
-            .IsRequired()
-            .HasMaxLength(60);
-        builder
-            .Property(u => u.Email)
-            .IsRequired()
-            .HasMaxLength(255);
-        builder
-            .Property(u => u.PasswordHash)
-            .IsRequired();
-        builder
             .HasOne(u => u.UserImage)
             .WithOne(i => i.User)
             .HasForeignKey<UserImageEntity>(i => i.UserId)

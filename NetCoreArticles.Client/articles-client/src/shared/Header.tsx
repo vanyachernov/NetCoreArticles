@@ -3,7 +3,6 @@ import {useDisclosure, useToast} from "@chakra-ui/react";
 import {useState} from "react";
 import {Article, ArticleRequest} from "../entities/article.tsx";
 import {useNavigate} from "react-router-dom";
-import ArticleStatusToast from "../features/ArticleStatusToast.tsx";
 
 interface Props {
     onCreateArticle: (request: ArticleRequest) => void;
@@ -54,11 +53,10 @@ export default function Header({onCreateArticle}: Props) {
         <header className="container mx-auto px-4 lg:px-0">
             <div className="flex justify-between items-center pt-5">
                 <a className="font-bold text-3xl cursor-pointer" onClick={(e) => {
-                    navigate("/"); // Navigate back
+                    navigate("/");
                 }}>Copywriter</a>
                 <div className="space-x-5 align-middle">
-                    <a href="#" onClick={onOpen} className="cursor-pointer hover:text-teal-400 transition duration-200">New
-                        post</a>
+                    <a href="#" onClick={onOpen} className="cursor-pointer hover:text-teal-400 transition duration-200">New post</a>
                     <a href="#" className="cursor-pointer hover:text-teal-400 transition duration-200">About</a>
                     <a href="#" className="bg-teal-500 py-2 px-4 rounded-full text-white">Sign In</a>
                 </div>

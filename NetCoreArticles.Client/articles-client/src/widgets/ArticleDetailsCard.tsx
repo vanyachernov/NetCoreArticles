@@ -2,6 +2,7 @@ import {Avatar} from "@chakra-ui/react";
 import moment from "moment";
 import {Article} from "../entities/article.tsx";
 import {BsBarChartFill} from "react-icons/bs";
+import parse from "html-react-parser";
 
 interface ArticleProps {
     article: Article
@@ -38,9 +39,9 @@ export default function ArticleDetailsCard({article}: ArticleProps) {
             </div>
 
             <div className="max-w-2xl w-full text-left">
-                <p className="text-lg text-gray-800 leading-relaxed">
-                    {article.content}
-                </p>
+                <div className="text-lg text-gray-800 leading-relaxed">
+                    {parse(article.content)}
+                </div>
             </div>
         </div>
     );

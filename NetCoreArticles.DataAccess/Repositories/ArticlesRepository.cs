@@ -100,9 +100,8 @@ public class ArticlesRepository : IArticlesRepository
 
             var userResult = User.Create(
                 articleEntity.Author.Id, 
-                articleEntity.Author.Username,
+                articleEntity.Author.UserName,
                 articleEntity.Author.Email, 
-                articleEntity.Author.PasswordHash,
                 userImage
             );
 
@@ -176,9 +175,8 @@ public class ArticlesRepository : IArticlesRepository
         
         var userResult = User.Create(
             articleEntity.Author.Id,
-            articleEntity.Author.Username,
+            articleEntity.Author.UserName,
             articleEntity.Author.Email,
-            articleEntity.Author.PasswordHash,
             userImage
         );
 

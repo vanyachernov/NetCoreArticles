@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.OpenApi.Models;
 using NetCoreArticles.Core.Abstractions;
 using NetCoreArticles.DataAccess;
+using NetCoreArticles.DataAccess.Entities;
 using NetCoreArticles.DataAccess.Repositories;
 using NetCoreArticles.Infrastructure.Features;
 using NetCoreArticles.Infrastructure.Services;
@@ -12,6 +15,18 @@ var builder = WebApplication.CreateBuilder(args);
     {
         options.UseNpgsql(builder.Configuration.GetConnectionString("DbContext"));
     });
+    
+    builder.Services.AddAuthorization();
+
+    builder.Services.AddIdentity<UserEntity, IdentityRole<Guid>>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireDigit = false;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+    
     builder.Services.AddScoped<IArticlesRepository, ArticlesRepository>();
     builder.Services.AddScoped<ILikesRepository, LikesRepository>();
     builder.Services.AddScoped<IImagesRepository, ImagesRepository>();
@@ -24,15 +39,6 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
-    builder.Services.AddCors(options =>
-    {
-        options.AddDefaultPolicy(policy =>
-        {
-            policy.WithOrigins("http://localhost:5173");
-            policy.AllowAnyHeader();
-            policy.AllowAnyMethod();
-        });
-    });
 }
 
 var app = builder.Build();

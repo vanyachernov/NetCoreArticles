@@ -20,9 +20,8 @@ public class UsersRepository : IUsersRepository
         var userEntity = new UserEntity
         {
             Id = user.Id,
-            Username = user.Username,
+            UserName = user.Username,
             Email = user.Email,
-            PasswordHash = user.PasswordHash
         };
 
         await _context.Users
@@ -57,9 +56,8 @@ public class UsersRepository : IUsersRepository
                 {
                     return User.Create(
                         u.Id,
-                        u.Username,
+                        u.UserName,
                         u.Email,
-                        u.PasswordHash,
                         userImageResult.Value
                     ).Value;
                 }
@@ -96,9 +94,8 @@ public class UsersRepository : IUsersRepository
 
         var user = User.Create(
             userEntity.Id,
-            userEntity.Username,
+            userEntity.UserName,
             userEntity.Email,
-            userEntity.PasswordHash,
             userImageResult.Value
         );
 

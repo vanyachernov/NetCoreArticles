@@ -68,7 +68,6 @@ public class UsersController : ControllerBase
             Guid.NewGuid(),
             user.Username,
             user.Email,
-            _passwordHasherService.Generate(user.Password), 
             imageProcessingResult.Value);
 
         if (userProcessingResult.IsFailure)
