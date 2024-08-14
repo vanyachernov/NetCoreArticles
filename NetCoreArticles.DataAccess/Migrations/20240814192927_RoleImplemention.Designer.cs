@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetCoreArticles.DataAccess;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NetCoreArticles.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240814192927_RoleImplemention")]
+    partial class RoleImplemention
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -104,13 +107,6 @@ namespace NetCoreArticles.DataAccess.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = new Guid("223b7835-ebe1-4231-a175-398adb60c9fe"),
-                            RoleId = new Guid("8fe9b3b0-ba6a-45f5-ad13-cd9c17bf252f")
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
@@ -148,7 +144,7 @@ namespace NetCoreArticles.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 8, 14, 19, 38, 50, 342, DateTimeKind.Utc).AddTicks(8480));
+                        .HasDefaultValue(new DateTime(2024, 8, 14, 19, 29, 27, 290, DateTimeKind.Utc).AddTicks(280));
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -158,7 +154,7 @@ namespace NetCoreArticles.DataAccess.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 8, 14, 19, 38, 50, 342, DateTimeKind.Utc).AddTicks(8660));
+                        .HasDefaultValue(new DateTime(2024, 8, 14, 19, 29, 27, 290, DateTimeKind.Utc).AddTicks(440));
 
                     b.Property<int>("Views")
                         .ValueGeneratedOnAdd()
@@ -198,7 +194,7 @@ namespace NetCoreArticles.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 8, 14, 19, 38, 50, 343, DateTimeKind.Utc).AddTicks(2470));
+                        .HasDefaultValue(new DateTime(2024, 8, 14, 19, 29, 27, 290, DateTimeKind.Utc).AddTicks(3970));
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");

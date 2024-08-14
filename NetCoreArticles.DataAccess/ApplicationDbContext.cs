@@ -6,7 +6,7 @@ using NetCoreArticles.DataAccess.Entities;
 
 namespace NetCoreArticles.DataAccess;
 
-public class ApplicationDbContext : IdentityDbContext<UserEntity, IdentityRole<Guid>, Guid>
+public class ApplicationDbContext : IdentityDbContext<UserEntity, RoleEntity, Guid>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
     
@@ -21,7 +21,9 @@ public class ApplicationDbContext : IdentityDbContext<UserEntity, IdentityRole<G
         modelBuilder.ApplyConfiguration(new ImageConfiguration());
         modelBuilder.ApplyConfiguration(new UsersImageConfiguration());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.ApplyConfiguration(new RoleConfiguration());
         modelBuilder.ApplyConfiguration(new LikeConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
         
         base.OnModelCreating(modelBuilder);
     }
